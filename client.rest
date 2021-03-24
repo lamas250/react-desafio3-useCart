@@ -1,0 +1,5 @@
+GET http://localhost:3333/stock
+
+###
+
+GET http://localhost:3333/products
