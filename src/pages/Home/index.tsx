@@ -23,28 +23,31 @@ interface CartItemsAmount {
 
 const Home = (): JSX.Element => {
   const [products, setProducts] = useState<ProductFormatted[]>([]);
-  // const { addProduct, cart } = useCart();
+  const { addProduct, cart } = useCart();
 
-  // const cartItemsAmount = cart.reduce((sumAmount, product) => {
-  //   // TODO
-  // }, {} as CartItemsAmount)
+  const cartItemsAmount = cart.reduce((sumAmount, product) => {
+    const newSumAmount = {...sumAmount};
+    newSumAmount[product.id] = product.amount;
+
+    return newSumAmount;
+  }, {} as CartItemsAmount)
 
   useEffect(() => {
     async function loadProducts() {
-      const {data} = await api.get<Product[]>('/products');
-      const formatted = data.map<ProductFormatted>(r => ({
-        ...r,
-        priceFormatted: formatPrice(r.price)
-      }));
-
-      setProducts(formatted);
+      const response = await api.get<Product[]>('products');
+      
+      const data = response.data.map(product => ({
+        ...product,
+        priceFormatted: formatPrice(product.price)
+      }))
+      setProducts(data);
     }
 
     loadProducts();
   }, []);
 
   function handleAddProduct(id: number) {
-    // TODO
+    addProduct(id)    
   }
 
   return (
@@ -55,15 +58,15 @@ const Home = (): JSX.Element => {
             <li>
               <img src={p.image} alt="Tênis de Caminhada Leve Confortável" />
               <strong>{p.title}</strong>
-              <span>{p.price}</span>
+              <span>{p.priceFormatted}</span>
               <button
                 type="button"
                 data-testid="add-product-button"
-              // onClick={() => handleAddProduct(product.id)}
+              onClick={() => handleAddProduct(p.id)}
               >
                 <div data-testid="cart-product-quantity">
                   <MdAddShoppingCart size={16} color="#FFF" />
-                  {/* {cartItemsAmount[product.id] || 0} */} 2
+                  {cartItemsAmount[p.id] || 0} 
                 </div>
 
                 <span>ADICIONAR AO CARRINHO</span>
